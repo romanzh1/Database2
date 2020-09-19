@@ -1,0 +1,15 @@
+{
+  "name": "seminar2",
+  "version": "1.0.0",
+  "description": "",
+  "main": "seminar2.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "pg": "^8.3.3"
+  }
+}
