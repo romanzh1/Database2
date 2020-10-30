@@ -124,8 +124,68 @@ app.route('/make_order/:id').post(async (req, res) => {
         
 })
 
+//Удалить заказ
+app.route('/delete_order/:id').get(async (req, res) => {
+    let pgclient = await pool.connect()
+    try {
+        const { id } = req.params
+        
+        await pgclient.query('Begin')
+        
+        const { rows } = await pgclient.query(
+            `
+            Delete from order_menu where order_id = $1;
+            `, [id])
+        const { rows1 } = await pgclient.query(
+            `
+            Delete from order_ where id = $1;
+            `, [id])
+        await pgclient.query('Commit')
+
+        res.send(rows, rows1)
+        } catch(err){
+            res.status(500).send({
+                error: err.message
+            })
+            console.error(err)
+        } finally{
+            await pgclient.release()
+        }
+        
+})
+
 //Зарегистрироваться
 app.route('/sign_up').post(async (req, res) => {
+    const {
+        name, 
+        address,
+        phone,
+        email,
+        password 
+    } = req.body
+    
+    let pgclient = await pool.connect()
+    try{
+        const { rows } = await pgclient.query(`
+        Insert into _client (name, address, phone, email, password)
+        Values ($1, $2, $3, $4, $5) Returning id; 
+        `,[name, address, phone, email, password])
+        
+        res.send({
+            id: rows[0].id
+        })
+    } catch(err){
+        res.status(500).send({
+            error: err.message
+        })
+        console.error(err)
+    } finally{
+        await pgclient.release()
+    }
+})
+
+/* //Вход в систему
+app.route('/sign_in').post(async (req, res) => {
     const {
         name, 
         address,
@@ -152,7 +212,7 @@ app.route('/sign_up').post(async (req, res) => {
     } finally{
         await pgclient.release()
     }
-})
+}) */
 
 app.listen(8080, () => {
     console.log('Server started! on http://localhost:8080')
