@@ -5,18 +5,45 @@ const pool = require('../../config/db')
  * @param {number} id - ID клиента
  */
 async function findOrderByClientID(id) {
-  // TODO: в этой функции ещё возвращать стоимость заказа (д)
   const { rows } = await pool.query(
     `
-  Select id, client_id, created_at
-  From order_
-  Where client_id = $1
-  Order by created_at Desc
+    Select id, client_id, created_at, sum(om.count * om.price::numeric) as price
+    From order_ ord
+    Inner join order_menu om On om.order_id = ord.id
+    Where client_id = 6
+    Group by created_at, id
+    Order by created_at Desc
   `,
     [id]
   )
-
   return rows
+}
+
+/**
+ * DeleteOrder удаляет заказ
+ * @param {number} id - ID заказа
+ */
+async function DeleteOrder(id) {
+  let pgclient = await pool.connect()
+  try{
+    await pgclient.query('Begin')
+
+    const { rows } = await pgclient.query(
+    `
+      Delete from order_menu where order_id = $1;
+    `, [id])
+    await pgclient.query(
+    `
+      Delete from order_ where id = $1;
+    `, [id])
+    await pgclient.query('Commit')
+    return rows
+  } catch (err) {
+    await pgclient.query('Rollback')
+    throw err
+  } finally {
+    await pgclient.release()
+  }
 }
 
 /**
@@ -137,4 +164,5 @@ async function makeOrder(id, order) {
 module.exports = {
   findOrderByClientID,
   makeOrder,
+  DeleteOrder
 }

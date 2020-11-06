@@ -7,7 +7,6 @@ const secret = 'jwt_secret_value'
  * @param {*} req
  */
 function checkAuth(req, res, next) {
-  console.log(25)
   const authHeader = req.headers.authorization
 
   let token

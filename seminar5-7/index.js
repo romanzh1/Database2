@@ -1,3 +1,18 @@
+/*
+Сделал удаление заказа, но оно возвращает, 
+как и создание заказа "Cannot post", не получилось исправить,
+однако, я смог добавить заказ, когда в postman добавил токен
+в авторизацию и убрал в ссылке id. 
+Сделал добавление http ошибки при не нахождении пользователя. 
+В функции поиска заказа клиента 
+сделал возвращение стоимости 
+заказа, но оно возвращает ошибку 
+"error": "bind message supplies 1 parameters, 
+but prepared statement \"\" requires 0", 
+решения пока не нашёл.
+*/
+
+
 require('dotenv').config()
 const express = require('express')
 const bodyParser = require('body-parser')
@@ -54,34 +69,16 @@ app.route('/make_order').post(authMiddleware, async (req, res) => {
   })
 
 //Удалить заказ
-/* app.route('/delete_order/:id').delete(async (req, res) => {
-    let pgclient = await pool.connect()
+app.route('/delete_order').delete(async (req, res) => {
     try {
-        const { id } = req.params
-        
-        await pgclient.query('Begin')
-        
-        const { rows } = await pgclient.query(
-            `
-            Delete from order_menu where order_id = $1;
-            `, [id])
-        const { rows1 } = await pgclient.query(
-            `
-            Delete from order_ where id = $1;
-            `, [id])
-        await pgclient.query('Commit')
-
-        res.send(rows, rows1)
+        const orderID = await orderService.DeleteOrder(req.params)
+        res.send({order_id: orderID})
         } catch(err){
             res.status(500).send({
                 error: err.message
             })
-            console.error(err)
-        } finally{
-            await pgclient.release()
         }
-        
-}) */
+})
 
 //Вход
 app.route('/sign_in').post(async (req, res) => {

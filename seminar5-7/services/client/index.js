@@ -56,9 +56,7 @@ async function signIn(email, password) {
   // если пользователь с таким email
   // не найден
   if (rows.length == 0) {
-    // TODO: можно помимо текста ошибки передавать
-    // ещё и http статус
-    throw new Error('User not found')
+    throw new Error('User not found, 401 Unauthorized')
   }
 
   // проверяем правильность пароля
