@@ -10,7 +10,7 @@ async function findOrderByClientID(id) {
     Select id, client_id, created_at, sum(om.count * om.price::numeric) as price
     From order_ ord
     Inner join order_menu om On om.order_id = ord.id
-    Where client_id = 6
+    Where client_id = $1
     Group by created_at, id
     Order by created_at Desc
   `,

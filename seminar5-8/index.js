@@ -1,30 +1,17 @@
-/*
-Сделал удаление заказа, но оно возвращает, 
-как и создание заказа "Cannot post", не получилось исправить,
-однако, я смог добавить заказ, когда в postman добавил токен
-в авторизацию и убрал в ссылке id. 
-Сделал добавление http ошибки при не нахождении пользователя. 
-В функции поиска заказа клиента 
-сделал возвращение стоимости 
-заказа, но оно возвращает ошибку 
-"error": "bind message supplies 1 parameters, 
-but prepared statement \"\" requires 0", 
-решения пока не нашёл.
-*/
-
-
 require('dotenv').config()
 const express = require('express')
 const bodyParser = require('body-parser')
 const authMiddleware = require('./middleware/auth')
 const app = express()
 
+var cors = require('cors')
 //Services
 const clientServices = require('./services/client')
 const menuService = require('./services/menu')
 const orderService = require('./services/order')
 
 app.use(bodyParser.json())
+app.use(cors())
 
 app.route('/menu').get(async(req, res) => {
     const { name } = req.query
@@ -69,9 +56,9 @@ app.route('/make_order').post(authMiddleware, async (req, res) => {
   })
 
 //Удалить заказ
-app.route('/delete_order').delete(async (req, res) => {
+app.route('/delete_order/:id').delete(async (req, res) => {
     try {
-        const orderID = await orderService.DeleteOrder(req.params)
+        const orderID = await orderService.DeleteOrder(req.params.id)
         res.send({order_id: orderID})
         } catch(err){
             res.status(500).send({
@@ -124,7 +111,7 @@ app.route('/sign_up').post(async (req, res) => {
     }
   })
 
-app.listen(8080, () => {
-    console.log('Server started! on http://localhost:8080')
+app.listen(80, () => {
+    console.log('Server started! on http://localhost:80')
 })
 
