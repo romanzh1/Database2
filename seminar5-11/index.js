@@ -14,10 +14,10 @@ app.use(bodyParser.json())
 app.use(cors())
 
 app.route('/menu').get(async(req, res) => {
-    const { name } = req.query
+    const { name, price } = req.query
 
     try {
-        const menu = await menuService.findMenu(name)
+        const menu = await menuService.findMenu(name, price)
         res.send(menu)
     } catch (err) {
         res.status(500).send({
